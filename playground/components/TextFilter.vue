@@ -9,7 +9,7 @@ const props = defineProps<{
   attribute: string
 }>()
 
-const updateFilter = (event: any) => {
+const updateFilter = (event: { target: { value: string } }) => {
   const filterValue = event.target.value
 
   if (filterValue.length === 0) {

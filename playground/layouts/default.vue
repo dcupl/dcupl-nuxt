@@ -5,7 +5,7 @@
 <template>
   <div>
     <div>
-      <Toolbar />
+      <ToolBar />
     </div>
     <div>
       <slot />

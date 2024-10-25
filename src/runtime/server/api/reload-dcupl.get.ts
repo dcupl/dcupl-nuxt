@@ -1,5 +1,3 @@
-import { getHeaders } from '../../../../playground/.nuxt/types/nitro-imports'
-
 export default defineEventHandler(async (event) => {
   const authorization = getHeader(event, 'Authorization')
   const { dcupl } = useRuntimeConfig()

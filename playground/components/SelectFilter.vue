@@ -23,7 +23,7 @@ const init = () => {
   })
 }
 
-const updateFilter = (event: any) => {
+const updateFilter = (event: { target: { value: string } }) => {
   const filterValue = event.target.value
 
   if (!filterValue) {

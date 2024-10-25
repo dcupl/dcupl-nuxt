@@ -51,7 +51,7 @@ export class DcuplInstance {
       return await this.customShouldUpdate()
     }
     if (!this.options?.config?.projectId) return true
-    const response: any = await $fetch(
+    const response: { changedAt: number } = await $fetch(
       `https://api.dcupl.com/projects/${this.options.config.projectId}/files/versions/draft/status`,
     )
 
