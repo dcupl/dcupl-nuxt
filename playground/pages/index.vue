@@ -1,9 +1,16 @@
 <script setup lang="ts">
-const articles = ref<any>([])
+import useDcupl from '../../src/composables/useDcupl'
 
-const { $dcupl } = useNuxtApp()
+const articles = useState('articles', () => [])
 
-const articleList = $dcupl.lists.create({ modelKey: 'Article' })
+const dcupl = useDcupl()
+
+const { data, status } = await useFetch('/api/test', {
+  method: 'GET',
+  lazy: true,
+})
+
+const articleList = dcupl.lists.create({ modelKey: 'Article' })
 articleList.catalog.query.applyOptions({ count: 10 })
 
 // get initial data
@@ -67,6 +74,14 @@ onBeforeUnmount(() => {
           </tbody>
         </table>
       </div>
+    </div>
+    <hr>
+    <h4>API-Request Test</h4>
+    <p v-if="status === 'pending'">
+      Lädt...
+    </p>
+    <div v-else>
+      {{ data }}
     </div>
   </div>
 </template>

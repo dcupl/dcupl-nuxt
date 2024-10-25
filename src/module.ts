@@ -1,6 +1,7 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, createResolver, addImportsDir, resolve, resolveModule } from '@nuxt/kit'
 import type { AppLoaderConfiguration, DcuplInitOptions } from '@dcupl/common'
 import { defu } from 'defu'
+import { runtimeDir } from '@nuxt/devtools/dist/dirs'
 
 // Module options TypeScript interface definition
 export interface DcuplModuleOptions extends DcuplInitOptions {
@@ -20,9 +21,16 @@ export default defineNuxtModule<DcuplModuleOptions>({
   },
   setup(_options, _nuxt) {
     const resolver = createResolver(import.meta.url)
+    const resolveRuntimeModule = (path: string) => resolveModule(path, { paths: resolver.resolve('./runtime') })
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolver.resolve('./runtime/plugin'))
+    addImportsDir(resolver.resolve(runtimeDir, 'composables'))
     _nuxt.options.runtimeConfig.public.dcupl = defu(_nuxt.options.runtimeConfig.public.dcupl, _options)
+
+    _nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.alias = nitroConfig.alias || {}
+      nitroConfig.alias['#dcupl'] = resolveRuntimeModule('./server/services')
+    })
   },
 })

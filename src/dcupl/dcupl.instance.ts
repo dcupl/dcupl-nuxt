@@ -28,7 +28,7 @@ export class DcuplInstance {
       }
       this.dcupl = response.dcupl
       this.dcuplAppLoader = response.loader
-      console.log('[dcupl initialized]', this.type, this.changedAt)
+      // console.log('[dcupl initialized]', this.type, this.changedAt)
     }
     catch (err) {
       console.log(err)

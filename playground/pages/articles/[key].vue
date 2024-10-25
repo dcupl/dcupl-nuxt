@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import useDcupl from '../../../src/composables/useDcupl'
+
 const { key } = useRoute().params
 
-const { $dcupl } = useNuxtApp()
+const dcupl = useDcupl()
 
-const article = $dcupl.query.one({
+const article = dcupl.query.one({
   modelKey: 'Article',
   itemKey: key as string,
   projection: {
