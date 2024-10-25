@@ -13,16 +13,16 @@ export class DcuplInstance {
   public dcuplAppLoader!: DcuplAppLoader
   public changedAt = 0
   private options: DcuplModuleOptions
-  private customShouldUpdate: () => Promise<boolean>
+  private customShouldUpdateFn: (() => Promise<boolean> | undefined) | undefined
 
   constructor(public type: string, options?: DcuplModuleOptions) {
     this.options = options
   }
 
-  public async init(overwriteOptions?: DcuplModuleOptions, customShouldUpdate?: () => Promise<boolean>) {
+  public async init(overwriteOptions?: DcuplModuleOptions, customShouldUpdateFn?: () => Promise<boolean>) {
     this.options = overwriteOptions || this.options
-    if (customShouldUpdate) {
-      this.customShouldUpdate = customShouldUpdate
+    if (customShouldUpdateFn) {
+      this.customShouldUpdateFn = customShouldUpdateFn
     }
     try {
       const response = await this.getNewDcuplInstance()
@@ -47,8 +47,8 @@ export class DcuplInstance {
    * Depending on your use case, you may have to modify this function.
    */
   public async shouldUpdate() {
-    if (this.options?.useCustomUpdateFunction) {
-      return this.customShouldUpdate()
+    if (this.options?.useCustomUpdateFunction && typeof this.customShouldUpdateFn === 'function') {
+      return this.customShouldUpdateFn()
     }
     if (!this.options?.config?.projectId) return true
     const response: { changedAt: number } = await $fetch(
