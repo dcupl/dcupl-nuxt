@@ -43,7 +43,7 @@ export default defineNuxtModule<DcuplModuleOptions>({
 
     const shouldUpdateContent = _options.shouldUpdate
       ? `export const customShouldUpdate = ${_options.shouldUpdate.toString()}`
-      : `export const customShouldUpdate = () => false`
+      : `export const customShouldUpdate = async () => false`
 
     addTemplate({
       filename: 'should-update.js',
