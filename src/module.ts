@@ -8,7 +8,6 @@ import {
 } from '@nuxt/kit'
 import type { AppLoaderConfiguration, DcuplInitOptions } from '@dcupl/common'
 import { defu } from 'defu'
-import { runtimeDir } from '@nuxt/devtools/dist/dirs'
 
 // Module options TypeScript interface definition
 export interface DcuplModuleOptions extends DcuplInitOptions {
@@ -17,6 +16,7 @@ export interface DcuplModuleOptions extends DcuplInitOptions {
     secret: string
   }
   shouldUpdate?: () => Promise<boolean>
+  customUpdateFunction?: boolean
 }
 
 export default defineNuxtModule<DcuplModuleOptions>({
@@ -36,7 +36,7 @@ export default defineNuxtModule<DcuplModuleOptions>({
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolver.resolve('./runtime/plugin'))
-    addImportsDir(resolver.resolve(runtimeDir, 'composables'))
+    addImportsDir(resolver.resolve('./runtime/composables'))
 
     const publicOptions = { ..._options }
     delete publicOptions.reloadHook

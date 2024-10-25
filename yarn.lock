@@ -7277,6 +7277,7 @@ __metadata:
     "@nuxt/test-utils": "npm:^3.14.4"
     "@types/node": "npm:latest"
     changelogen: "npm:^0.5.7"
+    defu: "npm:^6.1.4"
     eslint: "npm:^9.13.0"
     nuxt: "npm:^3.13.2"
     typescript: "npm:latest"
