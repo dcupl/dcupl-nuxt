@@ -14,7 +14,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-dcupl - Nuxt is a powerful and eas-to-use Nuxt module that semlessly integrates (dcupl)[https://dcupl.com] into your Nuxt application.
+dcupl - Nuxt is a powerful and easy-to-use Nuxt module that semlessly integrates [dcupl](https://dcupl.com) into your Nuxt application.
 
 ## Features
 
