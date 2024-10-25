@@ -43,6 +43,7 @@ export class DcuplInstance {
    * Depending on your use case, you may have to modify this function.
    */
   public async shouldUpdate() {
+    // TODO add custom functionality to module options.
     if (!this.options?.config?.projectId) return true
     const response: any = await $fetch(
       `https://api.dcupl.com/projects/${this.options.config.projectId}/files/versions/draft/status`,

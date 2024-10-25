@@ -12,9 +12,9 @@ export const useDcuplServerInstance: (event: H3Event) => Promise<Dcupl> = async 
       nitroApp._dcuplSession = dcuplSession
     }
     // Since this is stored on Server Side, maybe add a request to "update" the context instaed of validating on every request
-    if (await nitroApp._dcuplSession.shouldUpdate()) {
-      nitroApp._dcuplSession.init() // update async
-    }
+    // if (await nitroApp._dcuplSession.shouldUpdate()) {
+    //   nitroApp._dcuplSession.init() // update async
+    // }
     //
     return nitroApp._dcuplSession.dcupl
   }
