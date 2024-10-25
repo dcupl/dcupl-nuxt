@@ -12,7 +12,7 @@ export class DcuplInstance {
   public dcupl!: Dcupl
   public dcuplAppLoader!: DcuplAppLoader
   public changedAt = 0
-  private options: DcuplModuleOptions
+  private options: DcuplModuleOptions | undefined
   private customShouldUpdateFn: (() => Promise<boolean> | undefined) | undefined
 
   constructor(public type: string, options?: DcuplModuleOptions) {
@@ -64,6 +64,10 @@ export class DcuplInstance {
   }
 
   private async getNewDcuplInstance() {
+    if (!this.options) {
+      throw new Error('No dcupl options provided')
+    }
+
     const dcupl = new Dcupl(this.options)
 
     const dcuplAppLoader = new DcuplAppLoader()
