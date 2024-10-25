@@ -47,7 +47,7 @@ export class DcuplInstance {
    * Depending on your use case, you may have to modify this function.
    */
   public async shouldUpdate() {
-    if (this.options?.customUpdateFunction) {
+    if (this.options?.useCustomUpdateFunction) {
       return await this.customShouldUpdate()
     }
     if (!this.options?.config?.projectId) return true

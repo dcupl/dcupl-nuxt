@@ -16,7 +16,7 @@ export interface DcuplModuleOptions extends DcuplInitOptions {
     secret: string
   }
   shouldUpdate?: () => Promise<boolean>
-  customUpdateFunction?: boolean
+  useCustomUpdateFunction?: boolean
 }
 
 export default defineNuxtModule<DcuplModuleOptions>({
@@ -51,7 +51,7 @@ export default defineNuxtModule<DcuplModuleOptions>({
       getContents: () => shouldUpdateContent,
     })
 
-    publicOptions.customUpdateFunction = !!_options.shouldUpdate
+    publicOptions.useCustomUpdateFunction = !!_options.shouldUpdate
 
     _nuxt.options.runtimeConfig.public.dcupl = defu(_nuxt.options.runtimeConfig.public.dcupl, publicOptions)
     _nuxt.options.runtimeConfig.dcupl = defu(_nuxt.options.runtimeConfig.dcupl, {
