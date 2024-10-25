@@ -1,8 +1,8 @@
 {
-  "name": "my-module",
+  "name": "nuxt-dcupl",
   "version": "1.0.0",
-  "description": "My new Nuxt module",
-  "repository": "your-org/my-module",
+  "description": "DCUPL Nuxt Module",
+  "repository": "markus-gx/nuxt-dcupl",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -29,6 +29,9 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
+    "@dcupl/common": "^1.8.5",
+    "@dcupl/core": "^1.8.5",
+    "@dcupl/loader": "^1.8.5",
     "@nuxt/kit": "^3.13.2"
   },
   "devDependencies": {
