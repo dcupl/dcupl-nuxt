@@ -6,7 +6,7 @@ import { defineNuxtPlugin, useRequestEvent, useRuntimeConfig } from '#app'
 let status: 'initial_load' | 'idle' | 'updating' = 'initial_load'
 const serverDcuplInstance = new DcuplInstance('server')
 
-const initializeAndUpdateServerClient = async (dcupl: DcuplModuleOptions) => {
+const initializeOrUpdateServerClient = async (dcupl: DcuplModuleOptions) => {
   const shouldUpdate = await serverDcuplInstance.shouldUpdate()
   if (shouldUpdate) {
     if (status === 'initial_load') {
@@ -26,17 +26,17 @@ const initializeAndUpdateServerClient = async (dcupl: DcuplModuleOptions) => {
 }
 
 export default defineNuxtPlugin(async (_nuxtApp) => {
-  const { dcupl } = useRuntimeConfig().public as { dcupl: DcuplModuleOptions }
-  const sessionDcuplInstance = new DcuplInstance('session', dcupl)
+  const { dcupl: dcuplConfig } = useRuntimeConfig().public
+  const sessionDcuplInstance = new DcuplInstance('session', dcuplConfig)
   if (import.meta.server) {
-    await initializeAndUpdateServerClient(dcupl)
+    await initializeOrUpdateServerClient(dcuplConfig)
     const event = useRequestEvent()
     if (event) {
       event.context._dcupl = serverDcuplInstance.dcupl
     }
   }
   else {
-    await sessionDcuplInstance.init(dcupl)
+    await sessionDcuplInstance.init(dcuplConfig)
   }
 
   return {
