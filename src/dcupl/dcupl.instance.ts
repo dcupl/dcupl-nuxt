@@ -48,7 +48,7 @@ export class DcuplInstance {
    */
   public async shouldUpdate() {
     if (this.options?.useCustomUpdateFunction) {
-      return await this.customShouldUpdate()
+      return this.customShouldUpdate()
     }
     if (!this.options?.config?.projectId) return true
     const response: { changedAt: number } = await $fetch(
