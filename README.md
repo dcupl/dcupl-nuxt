@@ -56,6 +56,10 @@ export default {
       projectId: '<YOUR_PROJECT_ID>',
       apiKey: '<YOUR_API_KEY>',
     },
+    loader: {
+      applicationKey: 'default', //default value
+      //... loader options
+    },
     reloadHook: { //or false to deactivate the api endpoint
       secret: '<YOUR_SECRET>'
     },
