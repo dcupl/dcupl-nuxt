@@ -1,11 +1,11 @@
+import { fileURLToPath } from 'node:url'
 import {
   defineNuxtModule,
   addPlugin,
   createResolver,
   addImportsDir,
-  resolve,
   resolveModule,
-  addServerHandler,
+  addServerHandler, addTemplate,
 } from '@nuxt/kit'
 import type { AppLoaderConfiguration, DcuplInitOptions } from '@dcupl/common'
 import { defu } from 'defu'
@@ -17,6 +17,7 @@ export interface DcuplModuleOptions extends DcuplInitOptions {
   reloadHook?: {
     secret: string
   }
+  shouldUpdate?: () => Promise<boolean>
 }
 
 export default defineNuxtModule<DcuplModuleOptions>({
@@ -37,12 +38,27 @@ export default defineNuxtModule<DcuplModuleOptions>({
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolver.resolve('./runtime/plugin'))
     addImportsDir(resolver.resolve(runtimeDir, 'composables'))
+
     const publicOptions = { ..._options }
     delete publicOptions.reloadHook
+
+    const shouldUpdateContent = _options.shouldUpdate
+      ? `export const customShouldUpdate = ${_options.shouldUpdate.toString()}`
+      : `export const customShouldUpdate = () => false`
+
+    addTemplate({
+      filename: 'should-update.js',
+      write: true,
+      getContents: () => shouldUpdateContent,
+    })
+
+    publicOptions.customUpdateFunction = !!_options.shouldUpdate
+
     _nuxt.options.runtimeConfig.public.dcupl = defu(_nuxt.options.runtimeConfig.public.dcupl, publicOptions)
     _nuxt.options.runtimeConfig.dcupl = defu(_nuxt.options.runtimeConfig.dcupl, {
       reloadHook: _options.reloadHook,
     })
+
     if (_options.reloadHook && _options.reloadHook?.secret) {
       addServerHandler({
         route: '/api/reload-dcupl',

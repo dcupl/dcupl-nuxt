@@ -17,5 +17,9 @@ export default defineNuxtConfig({
     reloadHook: {
       secret: 'super-secret',
     },
+    // shouldUpdate: () => {
+    //   console.log('called my custom update function')
+    //   return true
+    // },
   },
 })

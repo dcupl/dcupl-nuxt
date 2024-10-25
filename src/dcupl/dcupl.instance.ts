@@ -13,13 +13,17 @@ export class DcuplInstance {
   public dcuplAppLoader!: DcuplAppLoader
   public changedAt = 0
   private options: DcuplModuleOptions
+  private customShouldUpdate: () => Promise<boolean>
 
   constructor(public type: string, options?: DcuplModuleOptions) {
     this.options = options
   }
 
-  public async init(overwriteOptions?: DcuplModuleOptions) {
+  public async init(overwriteOptions?: DcuplModuleOptions, customShouldUpdate?: () => Promise<boolean>) {
     this.options = overwriteOptions || this.options
+    if (customShouldUpdate) {
+      this.customShouldUpdate = customShouldUpdate
+    }
     try {
       const response = await this.getNewDcuplInstance()
       // destroy existing instance if it exists
@@ -43,7 +47,9 @@ export class DcuplInstance {
    * Depending on your use case, you may have to modify this function.
    */
   public async shouldUpdate() {
-    // TODO add custom functionality to module options.
+    if (this.options?.customUpdateFunction) {
+      return await this.customShouldUpdate()
+    }
     if (!this.options?.config?.projectId) return true
     const response: any = await $fetch(
       `https://api.dcupl.com/projects/${this.options.config.projectId}/files/versions/draft/status`,

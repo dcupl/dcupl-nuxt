@@ -1,5 +1,6 @@
 import { DcuplInstance } from '../dcupl/dcupl.instance'
 import type { DcuplModuleOptions } from '../module'
+import { customShouldUpdate } from '#build/should-update'
 import { defineNuxtPlugin } from '#app'
 
 let status: 'initial_load' | 'idle' | 'updating' = 'initial_load'
@@ -11,14 +12,14 @@ const initializeAndUpdateServerClient = async (dcupl: DcuplModuleOptions) => {
     if (status === 'initial_load') {
       // console.log('initial load')
       // for the initial load we have to wait for the server instance to be initialized
-      await serverDcuplInstance.init(dcupl)
+      await serverDcuplInstance.init(dcupl, customShouldUpdate)
       status = 'idle'
     }
     else if (status === 'idle') {
       // when the server instance is idle we can update it without waiting - serving the old version until the new one is ready
       // console.log('updating')
       status = 'updating'
-      serverDcuplInstance.init(dcupl)
+      serverDcuplInstance.init(dcupl, customShouldUpdate)
       status = 'idle'
     }
   }
