@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.4
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.3...v0.0.4)
+
+### 🏡 Chore
+
+- Move files into runtime folder ([df6e2e4](https://github.com/dcupl/dcupl-nuxt/commit/df6e2e4))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.3
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.2...v0.0.3)
