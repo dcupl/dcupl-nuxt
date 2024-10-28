@@ -78,26 +78,34 @@ export default {
 After setting up the module you can use the `dcupl` instance in your Nuxt application:
 
 ```vue
+<template>
+  <div>
+    {{ JSON.stringify(articles, null, 2) }}
+  </div>
+</template>
 <script setup lang="ts">
-  const dcupl = useDcupl()
-  const articleList = dcupl.lists.create({ modelKey: 'Article' })
-  articleList.catalog.query.applyOptions({ count: 10 })
-  
+  const articles = ref([]);
+  const dcupl = useDcupl();
+  const articleList = dcupl.lists.create({ modelKey: "Article" });
+  articleList.catalog.query.applyOptions({ count: 10 });
+
   // get initial data
-  articles.value = articleList.catalog.query.execute()
+  articles.value = articleList.catalog.query.execute();
 </script>
 ```
 
-Or in an API Endpoint:
+Or in an API Endpoint (`server/api/test.ts`):
 
 ```ts
-export default defineEventHandler(async (event) => {
-  const dcupl = await useDcuplServerInstance(event)
+import { useDcuplServerInstance } from "#dcupl";
 
-  const articleList = dcupl.lists.create({ modelKey: 'Article' })
-  articleList.catalog.query.applyOptions({ count: 10 })
-  return articleList.catalog.query.execute()
-})
+export default defineEventHandler(async (event) => {
+  const dcupl = await useDcuplServerInstance(event);
+
+  const articleList = dcupl.lists.create({ modelKey: "Article" });
+  articleList.catalog.query.applyOptions({ count: 10 });
+  return articleList.catalog.query.execute();
+});
 ```
 
 ## Reload dcupl Server Session
