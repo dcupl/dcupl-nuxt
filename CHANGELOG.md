@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.3
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.2...v0.0.3)
+
+### 🏡 Chore
+
+- Update publish command ([06e3d51](https://github.com/dcupl/dcupl-nuxt/commit/06e3d51))
+- Update readme and module ([c3c58e2](https://github.com/dcupl/dcupl-nuxt/commit/c3c58e2))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.2
 
 
