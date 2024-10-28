@@ -1,8 +1,8 @@
 {
-  "name": "nuxt-dcupl",
+  "name": "@dcupl/nuxt",
   "version": "1.0.0",
-  "description": "DCUPL Nuxt Module",
-  "repository": "markus-gx/nuxt-dcupl",
+  "description": "dcupl Nuxt Module",
+  "repository": "dcupl/dcupl-nuxt",
   "license": "MIT",
   "type": "module",
   "exports": {
