@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.5
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.4...v0.0.5)
+
+### 🏡 Chore
+
+- Update readme ([8a77a71](https://github.com/dcupl/dcupl-nuxt/commit/8a77a71))
+- Try to transpile ([d7a5023](https://github.com/dcupl/dcupl-nuxt/commit/d7a5023))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.4
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.3...v0.0.4)
