@@ -1,6 +1,6 @@
 import { Dcupl } from "@dcupl/core";
 import { DcuplAppLoader } from "@dcupl/loader";
-import type { DcuplModuleOptions } from "../module";
+import type { DcuplModuleOptions } from "../../module";
 
 /**
  * This class is used to manage the dcupl instance.

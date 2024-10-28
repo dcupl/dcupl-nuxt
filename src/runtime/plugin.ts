@@ -1,4 +1,4 @@
-import { DcuplInstance } from "../dcupl/dcupl.instance";
+import { DcuplInstance } from "./dcupl/dcupl.instance";
 import type { DcuplModuleOptions } from "../module";
 import { customShouldUpdate } from "#build/should-update";
 import { defineNuxtPlugin, useRequestEvent, useRuntimeConfig } from "#app";

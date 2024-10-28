@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useDcupl from "../../../src/composables/useDcupl";
+import useDcupl from "../../../src/runtime/composables/useDcupl";
 
 const { key } = useRoute().params;
 
