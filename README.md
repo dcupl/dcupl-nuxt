@@ -3,7 +3,7 @@ Get your module up and running quickly.
 
 Find and replace all on all files (CMD+SHIFT+F):
 - Name: dcupl - Nuxt
-- Package name: @nuxtjs/dcupl
+- Package name: @dcupl/nuxt
 - Description: My new Nuxt module
 -->
 
@@ -27,20 +27,20 @@ dcupl - Nuxt is a powerful and easy-to-use Nuxt module that semlessly integrates
 Install the module to your Nuxt application with one command:
 
 ```bash
-npx nuxi module add @nuxtjs/dcupl
+npx nuxi module add @dcupl/nuxt
 ```
 
 or using any package manager:
 
 ```bash
 # Using pnpm
-pnpm add @nuxtjs/dcupl
+pnpm add @dcupl/nuxt
 
 # Using yarn
-yarn add @nuxtjs/dcupl
+yarn add @dcupl/nuxt
 
 # Using npm
-npm install @nuxtjs/dcupl
+npm install @dcupl/nuxt
 ```
 
 Add the module to your `nuxt.config.js`:
@@ -48,7 +48,7 @@ Add the module to your `nuxt.config.js`:
 ```js
 export default {
   modules: [
-    '@nuxtjs/dcupl'
+    '@dcupl/nuxt'
   ],
   dcupl: {
     //Options

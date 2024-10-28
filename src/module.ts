@@ -22,7 +22,7 @@ export interface DcuplModuleOptions extends DcuplInitOptions {
 
 export default defineNuxtModule<DcuplModuleOptions>({
   meta: {
-    name: "@nuxtjs/dcupl",
+    name: "@dcupl/nuxt",
     configKey: "dcupl",
   },
   // Default configuration options of the Nuxt module
