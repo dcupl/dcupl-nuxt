@@ -2,35 +2,34 @@
 /**
  * @author Dominik Strasser (dcupl)
  */
-import type { DcuplList } from '@dcupl/core'
+import type { DcuplList } from "@dcupl/core";
 
 const props = defineProps<{
-  list: DcuplList
-  attribute: string
-}>()
+  list: DcuplList;
+  attribute: string;
+}>();
 
 const updateFilter = (event: { target: { value: string } }) => {
-  const filterValue = event.target.value
+  const filterValue = event.target.value;
 
   if (filterValue.length === 0) {
-    props.list.catalog.query.remove({ groupKey: props.attribute })
-  }
-  else {
+    props.list.catalog.query.remove({ groupKey: props.attribute });
+  } else {
     props.list.catalog.query.apply(
       {
         attribute: props.attribute,
-        operator: 'find',
+        operator: "find",
         value: `/${event.target.value}/`,
         options: {
-          transform: ['lowercase'],
+          transform: ["lowercase"],
         },
       },
       {
-        mode: 'set',
-      },
-    )
+        mode: "set",
+      }
+    );
   }
-}
+};
 </script>
 
 <template>
@@ -44,7 +43,7 @@ const updateFilter = (event: { target: { value: string } }) => {
         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         placeholder="ball"
         @keyup="updateFilter"
-      >
+      />
     </div>
   </div>
 </template>

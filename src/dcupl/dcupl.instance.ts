@@ -1,6 +1,6 @@
-import { Dcupl } from '@dcupl/core'
-import { DcuplAppLoader } from '@dcupl/loader'
-import type { DcuplModuleOptions } from '../module'
+import { Dcupl } from "@dcupl/core";
+import { DcuplAppLoader } from "@dcupl/loader";
+import type { DcuplModuleOptions } from "../module";
 
 /**
  * This class is used to manage the dcupl instance.
@@ -9,33 +9,37 @@ import type { DcuplModuleOptions } from '../module'
  * @see https://github.com/dcupl/dcupl-nuxt-starter/blob/main/dcupl/dcupl.instance.ts
  */
 export class DcuplInstance {
-  public dcupl!: Dcupl
-  public dcuplAppLoader!: DcuplAppLoader
-  public changedAt = 0
-  private options: DcuplModuleOptions | undefined
-  private customShouldUpdateFn: (() => Promise<boolean> | undefined) | undefined
+  public dcupl!: Dcupl;
+  public dcuplAppLoader!: DcuplAppLoader;
+  public changedAt = 0;
+  private options: DcuplModuleOptions | undefined;
+  private customShouldUpdateFn:
+    | (() => Promise<boolean> | undefined)
+    | undefined;
 
   constructor(public type: string, options?: DcuplModuleOptions) {
-    this.options = options
+    this.options = options;
   }
 
-  public async init(overwriteOptions?: DcuplModuleOptions, customShouldUpdateFn?: () => Promise<boolean>) {
-    this.options = overwriteOptions || this.options
+  public async init(
+    overwriteOptions?: DcuplModuleOptions,
+    customShouldUpdateFn?: () => Promise<boolean>
+  ) {
+    this.options = overwriteOptions || this.options;
     if (customShouldUpdateFn) {
-      this.customShouldUpdateFn = customShouldUpdateFn
+      this.customShouldUpdateFn = customShouldUpdateFn;
     }
     try {
-      const response = await this.getNewDcuplInstance()
+      const response = await this.getNewDcuplInstance();
       // destroy existing instance if it exists
       if (this.dcupl) {
-        this.dcupl.destroy()
+        this.dcupl.destroy();
       }
-      this.dcupl = response.dcupl
-      this.dcuplAppLoader = response.loader
+      this.dcupl = response.dcupl;
+      this.dcuplAppLoader = response.loader;
       // console.log('[dcupl initialized]', this.type, this.changedAt)
-    }
-    catch (err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -47,38 +51,41 @@ export class DcuplInstance {
    * Depending on your use case, you may have to modify this function.
    */
   public async shouldUpdate() {
-    if (this.options?.useCustomUpdateFunction && typeof this.customShouldUpdateFn === 'function') {
-      return this.customShouldUpdateFn()
+    if (
+      this.options?.useCustomUpdateFunction &&
+      typeof this.customShouldUpdateFn === "function"
+    ) {
+      return this.customShouldUpdateFn();
     }
-    if (!this.options?.config?.projectId) return true
+    if (!this.options?.config?.projectId) return true;
     const response: { changedAt: number } = await $fetch(
-      `https://api.dcupl.com/projects/${this.options.config.projectId}/files/versions/draft/status`,
-    )
+      `https://api.dcupl.com/projects/${this.options.config.projectId}/files/versions/draft/status`
+    );
 
-    const changedAt = response?.changedAt
+    const changedAt = response?.changedAt;
     if (changedAt && changedAt > this.changedAt) {
-      this.changedAt = changedAt
-      return true
+      this.changedAt = changedAt;
+      return true;
     }
-    return false
+    return false;
   }
 
   private async getNewDcuplInstance() {
     if (!this.options) {
-      throw new Error('No dcupl options provided')
+      throw new Error("No dcupl options provided");
     }
 
-    const dcupl = new Dcupl(this.options)
+    const dcupl = new Dcupl(this.options);
 
-    const dcuplAppLoader = new DcuplAppLoader()
+    const dcuplAppLoader = new DcuplAppLoader();
 
-    dcupl.loaders.add(dcuplAppLoader)
+    dcupl.loaders.add(dcuplAppLoader);
 
-    await dcuplAppLoader.config.fetch()
-    await dcuplAppLoader.process(this.options.loader)
+    await dcuplAppLoader.config.fetch();
+    await dcuplAppLoader.process(this.options.loader);
 
-    await dcupl.init()
+    await dcupl.init();
 
-    return { dcupl, loader: dcuplAppLoader }
+    return { dcupl, loader: dcuplAppLoader };
   }
 }

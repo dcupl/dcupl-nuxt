@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import useDcupl from '../../../src/composables/useDcupl'
+import useDcupl from "../../../src/composables/useDcupl";
 
-const { key } = useRoute().params
+const { key } = useRoute().params;
 
-const dcupl = useDcupl()
+const dcupl = useDcupl();
 
 const article = dcupl.query.one({
-  modelKey: 'Article',
+  modelKey: "Article",
   itemKey: key as string,
   projection: {
     $: true,
@@ -14,7 +14,7 @@ const article = dcupl.query.one({
       $: true, // also returns the details of the referenced vendor model
     },
   },
-})
+});
 </script>
 
 <template>

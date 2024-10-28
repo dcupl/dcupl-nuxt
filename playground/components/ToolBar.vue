@@ -2,7 +2,7 @@
 /**
  * @author Dominik Strasser (dcupl)
  */
-const infoVisible = ref(false)
+const infoVisible = ref(false);
 </script>
 
 <template>
@@ -10,15 +10,10 @@ const infoVisible = ref(false)
     <div class="container mx-auto py-3">
       <div class="flex justify-between items-center">
         <div class="w-full flex items-center justify-start gap-3">
-          <NuxtLink to="/">
-            Dcupl Nuxt Starter
-          </NuxtLink>
+          <NuxtLink to="/"> Dcupl Nuxt Starter </NuxtLink>
         </div>
         <div class="relative w-full flex items-center justify-end gap-3">
-          <a
-            target="_blank"
-            href="https://github.com/dcupl/dcupl-nuxt-starter"
-          >
+          <a target="_blank" href="https://github.com/dcupl/dcupl-nuxt-starter">
             <svg
               aria-hidden="true"
               height="24"
@@ -59,10 +54,9 @@ const infoVisible = ref(false)
             <p>
               <span class="font-semibold">The Models/Data</span> are loaded from
               the "Product Catalog" starter Project in the
-              <a
-                target="_blank"
-                href="https://console.dcupl.com"
-              >dcupl console</a>. Feel free to create a free account and your own project.
+              <a target="_blank" href="https://console.dcupl.com"
+                >dcupl console</a
+              >. Feel free to create a free account and your own project.
             </p>
           </div>
         </div>

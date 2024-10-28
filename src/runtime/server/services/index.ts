@@ -1,1 +1,1 @@
-export { useDcuplServerInstance } from './useDcuplServerInstance'
+export { useDcuplServerInstance } from "./useDcuplServerInstance";
