@@ -31,6 +31,6 @@ export const useDcuplServerInstance: (
     //
     return nitroApp._dcuplNitroInstance.dcupl;
   } else {
-    return event.context._dcupl as Dcupl;
+    return event.context._dcupl;
   }
 };
