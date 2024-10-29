@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v0.0.6
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.5...v0.0.6)
+
+### 🏡 Chore
+
+- Remove unused transpile step ([7f4a8f3](https://github.com/dcupl/dcupl-nuxt/commit/7f4a8f3))
+- Update packages ([d2b3682](https://github.com/dcupl/dcupl-nuxt/commit/d2b3682))
+- Remove unused cast ([13dcf51](https://github.com/dcupl/dcupl-nuxt/commit/13dcf51))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.5
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.4...v0.0.5)
