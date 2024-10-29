@@ -45,6 +45,23 @@ npm install @dcupl/nuxt
 
 Add the module to your `nuxt.config.js`:
 
+### Simple Setup
+Uses a the public `Product Catalog Starter` - [dcupl Console](https://console.dcupl.com)
+
+```js
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  modules: ["@dcupl/nuxt"],
+  dcupl: {
+    config: {
+      projectId: "PP7ECntN4AI5Zfn5vEou",
+      apiKey: "e0aa9e13-8f82-4edb-a5f3-3cf0c9e40207",
+    },
+  },
+});
+```
+
+### Advanced Setup
 ```js
 export default {
   modules: ["@dcupl/nuxt"],
