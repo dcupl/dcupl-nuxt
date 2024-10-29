@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.8
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.7...v0.0.8)
+
+### 🏡 Chore
+
+- Update #dcupl/server import ([4611f20](https://github.com/dcupl/dcupl-nuxt/commit/4611f20))
+- Remove paths from tsconfig ([7805cb2](https://github.com/dcupl/dcupl-nuxt/commit/7805cb2))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.7
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.6...v0.0.7)
