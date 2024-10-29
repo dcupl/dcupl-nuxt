@@ -1,10 +1,7 @@
 {
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
-    "paths": {
-      "#dcupl": ["./.nuxt/server/services"]
-    }
+    "moduleResolution": "node"
   },
   "exclude": ["dist", "node_modules", "playground"]
 }
