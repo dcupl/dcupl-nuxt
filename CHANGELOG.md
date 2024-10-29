@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.0.7
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.6...v0.0.7)
+
+### 🩹 Fixes
+
+- Prepend runtime folder ([0b2e46a](https://github.com/dcupl/dcupl-nuxt/commit/0b2e46a))
+
+### 🏡 Chore
+
+- Update readme and package.json ([6dea142](https://github.com/dcupl/dcupl-nuxt/commit/6dea142))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.6
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.5...v0.0.6)
