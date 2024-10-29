@@ -40,10 +40,6 @@ export default defineNuxtModule<DcuplModuleOptions>({
     addPlugin(resolver.resolve("./runtime/plugin"));
     addImportsDir(resolver.resolve("./runtime/composables"));
 
-    _nuxt.options.build.transpile.push("@dcupl/core");
-    _nuxt.options.build.transpile.push("@dcupl/common");
-    _nuxt.options.build.transpile.push("@dcupl/loader");
-
     const publicOptions = { ..._options };
     delete publicOptions.reloadHook;
 
