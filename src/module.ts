@@ -8,7 +8,6 @@ import {
 } from "@nuxt/kit";
 import type { AppLoaderConfiguration, DcuplInitOptions } from "@dcupl/common";
 import { defu } from "defu";
-import { resolve } from "node:path";
 
 // Module options TypeScript interface definition
 export interface DcuplModuleOptions extends DcuplInitOptions {
@@ -32,11 +31,11 @@ export default defineNuxtModule<DcuplModuleOptions>({
     },
   },
   setup(_options, _nuxt) {
-    const resolver = createResolver(import.meta.url);
+    const { resolve } = createResolver(import.meta.url);
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve("./runtime/plugin"));
-    addImportsDir(resolver.resolve("./runtime/composables"));
+    addPlugin(resolve("./runtime/plugin"));
+    addImportsDir(resolve("./runtime/composables"));
 
     const publicOptions = { ..._options };
     delete publicOptions.reloadHook;
@@ -67,16 +66,34 @@ export default defineNuxtModule<DcuplModuleOptions>({
     if (_options.reloadHook && _options.reloadHook?.secret) {
       addServerHandler({
         route: "/api/reload-dcupl",
-        handler: resolver.resolve("./runtime/server/api/reload-dcupl.get"),
+        handler: resolve("./runtime/server/api/reload-dcupl.get"),
       });
     }
 
     _nuxt.hook("nitro:config", (nitroConfig) => {
       nitroConfig.alias = nitroConfig.alias || {};
-      nitroConfig.alias["#dcupl"] = resolve(
+      nitroConfig.alias["#dcupl/server"] = resolve(
         __dirname,
         "./runtime/server/services"
       );
+    });
+
+    addTemplate({
+      filename: "types/dcupl.d.ts",
+      getContents: () =>
+        [
+          "declare module '#dcupl/server' {",
+          `  const useDcuplServerInstance: typeof import('${resolve(
+            "./runtime/server/services"
+          )}').useDcuplServerInstance`,
+          "}",
+        ].join("\n"),
+    });
+
+    _nuxt.hook("prepare:types", async (options) => {
+      options.references.push({
+        path: resolve(_nuxt.options.buildDir, "types/dcupl.d.ts"),
+      });
     });
   },
 });

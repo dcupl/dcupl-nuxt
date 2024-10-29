@@ -1,4 +1,4 @@
-import { useDcuplServerInstance } from "#dcupl";
+import { useDcuplServerInstance } from "#dcupl/server";
 
 export default defineEventHandler(async (event) => {
   const dcupl = await useDcuplServerInstance(event);

@@ -140,16 +140,15 @@ const article = dcupl.query.one({
 Or in an API Endpoint (`server/api/articles/[key].ts`):
 
 ```ts
-import { useDcuplServerInstance } from "#dcupl";
+import { useDcuplServerInstance } from "#dcupl/server";
 
 export default defineEventHandler(async (event) => {
-  const key = getRouterParam(event, "key");
-
   const dcupl = await useDcuplServerInstance(event);
 
-  return dcupl.query.one({
+  return dcupl.query.execute({
     modelKey: "Article",
-    itemKey: key,
+    count: 10,
+    queries: [],
   });
 });
 ```
