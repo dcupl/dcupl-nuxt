@@ -2,7 +2,10 @@
   "name": "@dcupl/nuxt",
   "version": "0.0.6",
   "description": "dcupl Nuxt Module",
-  "repository": "dcupl/dcupl-nuxt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcupl/dcupl-nuxt.git"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {

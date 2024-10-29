@@ -47,72 +47,118 @@ Add the module to your `nuxt.config.js`:
 
 ```js
 export default {
-  modules: [
-    '@dcupl/nuxt'
-  ],
+  modules: ["@dcupl/nuxt"],
   dcupl: {
     //Options
     config: {
-      projectId: '<YOUR_PROJECT_ID>',
-      apiKey: '<YOUR_API_KEY>',
+      projectId: "<YOUR_PROJECT_ID>",
+      apiKey: "<YOUR_API_KEY>",
     },
     loader: {
-      applicationKey: 'default', //default value
+      applicationKey: "default", //default value
       //... loader options
     },
-    reloadHook: { //or false to deactivate the api endpoint
-      secret: '<YOUR_SECRET>'
+    reloadHook: {
+      //or false to deactivate the api endpoint
+      secret: "<YOUR_SECRET>",
     },
-    shouldUpdate: async () => { //optional, default is the dcupl default implementation see: https://github.com/markus-gx/nuxt-dcupl/blob/main/src/dcupl/dcupl.instance.ts#L49
+    shouldUpdate: async () => {
+      //optional, default is the dcupl default implementation see: https://github.com/markus-gx/nuxt-dcupl/blob/main/src/dcupl/dcupl.instance.ts#L49
       //Here you can add custom functionality how to validate if the update should be applied
       //to the current instance. If you return false the update will be ignored.
-      return true
-    }
+      return true;
+    },
     // and all other init options provided by dcupl (https://docs.dcupl.com/docs/Introduction)
-  }
-}
+  },
+};
 ```
 
 ## Usage
 
 After setting up the module you can use the `dcupl` instance in your Nuxt application:
 
+### Main Catalog Page
+
 ```vue
 <template>
   <div>
-    {{ JSON.stringify(articles, null, 2) }}
+    <pre><code>{{ JSON.stringify(article, null, 2) }}</code></pre>
   </div>
 </template>
 <script setup lang="ts">
-  const articles = ref([]);
-  const dcupl = useDcupl();
-  const articleList = dcupl.lists.create({ modelKey: "Article" });
-  articleList.catalog.query.applyOptions({ count: 10 });
+const articles = ref<any>([]);
 
-  // get initial data
-  articles.value = articleList.catalog.query.execute();
+const dcupl = useDcupl();
+
+// create a new list. A DcuplList contains all your model data and persists the applied queries.
+const articleList = dcupl.lists.create({ modelKey: "Article" });
+articleList.catalog.query.applyOptions({ count: 10 });
+
+// get initial data
+articles.value = articleList.catalog.query.execute();
+
+// listen for updates to the list and update the articles
+articleList.on((msg) => {
+  if (msg.action === "update") {
+    articles.value = articleList.catalog.query.execute();
+  }
+});
+
+onBeforeUnmount(() => {
+  // cleanup on unmount
+  articleList.destroy();
+});
 </script>
 ```
 
-Or in an API Endpoint (`server/api/test.ts`):
+### Detail Page
+
+```vue
+<template>
+  <div>
+    <pre><code>{{ JSON.stringify(article, null, 2) }}</code></pre>
+  </div>
+</template>
+<script setup lang="ts">
+const { key } = useRoute().params;
+
+const dcupl = useDcupl();
+
+const article = dcupl.query.one({
+  modelKey: "Article",
+  itemKey: key as string,
+  projection: {
+    $: true,
+    vendorId: {
+      $: true, // also returns the details of the referenced vendor model
+    },
+  },
+});
+</script>
+```
+
+Or in an API Endpoint (`server/api/articles/[key].ts`):
 
 ```ts
 import { useDcuplServerInstance } from "#dcupl";
 
 export default defineEventHandler(async (event) => {
+  const key = getRouterParam(event, "key");
+
   const dcupl = await useDcuplServerInstance(event);
 
-  const articleList = dcupl.lists.create({ modelKey: "Article" });
-  articleList.catalog.query.applyOptions({ count: 10 });
-  return articleList.catalog.query.execute();
+  return dcupl.query.one({
+    modelKey: "Article",
+    itemKey: key,
+  });
 });
 ```
 
-## Reload dcupl Server Session
+## Reload dcupl Server Instance
 
-To reload the dcupl server session you can use the reload hook. This will trigger a reload of the dcupl server session and update the data in your application.
-This module exposes and API Endpoint called `/api/reload-dcupl`. 
-Pass an `Authorization` header with the secret you defined in the module options.
+To reload the dcupl server Instance you can use the reload hook. This will trigger a reload of the dcupl server session and update the data in your application.
+This module exposes and API Endpoint called `/api/reload-dcupl`.
+Pass an `Authorization` header or an token with the secret you defined in the module options.
 
 ## Contribution
 
@@ -145,16 +191,13 @@ Pass an `Authorization` header with the secret you defined in the module options
 
 </details>
 
-
 <!-- Badges -->
+
 [npm-version-src]: https://img.shields.io/npm/v/@nuxtjs/dcupl/latest.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-version-href]: https://npmjs.com/package/@nuxtjs/dcupl
-
 [npm-downloads-src]: https://img.shields.io/npm/dm/@nuxtjs/dcupl.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-downloads-href]: https://npm.chart.dev/@nuxtjs/dcupl
-
 [license-src]: https://img.shields.io/npm/l/@nuxtjs/dcupl.svg?style=flat&colorA=020420&colorB=00DC82
 [license-href]: https://npmjs.com/package/@nuxtjs/dcupl
-
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
 [nuxt-href]: https://nuxt.com
