@@ -37,6 +37,14 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
     await sessionDcuplInstance.init(dcuplConfig);
   }
 
+  const { hook } = _nuxtApp;
+
+  hook("app:rendered", () => {
+    if (serverDcuplInstance.dcupl) {
+      serverDcuplInstance.dcupl.lists.destroy();
+    }
+  });
+
   return {
     provide: {
       dcupl: import.meta.server
