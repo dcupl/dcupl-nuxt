@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.10
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.9...v0.0.10)
+
+### 🩹 Fixes
+
+- Destroy lists when SSR rendering finished ([596c2aa](https://github.com/dcupl/dcupl-nuxt/commit/596c2aa))
+
+### ❤️ Contributors
+
+- Dominik Strasser ([@dominikstrasser](http://github.com/dominikstrasser))
+
 ## v0.0.9
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.8...v0.0.9)
