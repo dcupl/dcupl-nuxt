@@ -209,11 +209,11 @@ Pass an `Authorization` header or an token with the secret you defined in the mo
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/@nuxtjs/dcupl/latest.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-version-href]: https://npmjs.com/package/@nuxtjs/dcupl
-[npm-downloads-src]: https://img.shields.io/npm/dm/@nuxtjs/dcupl.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npm.chart.dev/@nuxtjs/dcupl
-[license-src]: https://img.shields.io/npm/l/@nuxtjs/dcupl.svg?style=flat&colorA=020420&colorB=00DC82
-[license-href]: https://npmjs.com/package/@nuxtjs/dcupl
+[npm-version-src]: https://img.shields.io/npm/v/@dcupl/nuxt/latest.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-version-href]: https://www.npmjs.com/package/@dcupl/nuxt
+[npm-downloads-src]: https://img.shields.io/npm/dm/@dcupl/nuxt.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-downloads-href]: https://npm.chart.dev/@dcupl/nuxt
+[license-src]: https://img.shields.io/npm/l/@dcupl/nuxt.svg?style=flat&colorA=020420&colorB=00DC82
+[license-href]: https://npmjs.com/package/@dcupl/nuxt
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
 [nuxt-href]: https://nuxt.com
