@@ -23,12 +23,21 @@ export const useDcuplServerInstance: (
       );
       await dcuplNitroInstance.init();
       nitroApp._dcuplNitroInstance = dcuplNitroInstance;
+    } else if (await nitroApp._dcuplNitroInstance.shouldUpdate()) {
+      // Unlike the SSR `serverDcuplInstance` (which is re-validated on every
+      // request in the plugin), the Nitro instance is created once and would
+      // otherwise keep serving stale data to server API routes until the
+      // process restarts. When the dcupl data has changed, reload it here.
+      //
+      // The reload is awaited on purpose: a fire-and-forget reload would still
+      // serve the old (or missing) data on the very request that detects the
+      // change — e.g. a newly created item would 404. `shouldUpdate()` only
+      // returns true once per actual change (guarded by an internal
+      // `changedAt`), so the expensive reload runs at most once per data
+      // change while all other requests just perform one lightweight check.
+      await nitroApp._dcuplNitroInstance.init();
     }
-    // Since this is stored on Server Side, maybe add a request to "update" the context instaed of validating on every request
-    // if (await nitroApp._dcuplNitroInstance.shouldUpdate()) {
-    //   nitroApp._dcuplNitroInstance.init() // update async
-    // }
-    //
+
     return nitroApp._dcuplNitroInstance.dcupl;
   } else {
     return event.context._dcupl;
