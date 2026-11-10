@@ -110,17 +110,18 @@ const dcupl = useDcupl();
 const articleList = dcupl.lists.create({ modelKey: "Article" });
 articleList.catalog.query.applyOptions({ count: 10 });
 
-const articles = ref(articleList.catalog.query.execute());
+const articles = ref(articleList.catalog.query.items());
 
-// follow the list when queries change
-articleList.on((msg) => {
-  if (msg.action === "update") {
-    articles.value = articleList.catalog.query.execute();
-  }
+// follow the list when filters or paging change
+const stopFollowing = articleList.onResultChange(() => {
+  articles.value = articleList.catalog.query.items();
 });
 
-// in the browser; on the server the module cleans up after the request
-onBeforeUnmount(() => articleList.destroy());
+// on the server the module destroys the list after the request
+onBeforeUnmount(() => {
+  stopFollowing();
+  articleList.destroy();
+});
 </script>
 ```
 
@@ -148,12 +149,14 @@ const article = dcupl.query.one({
 import { useDcuplServerInstance } from "#dcupl/server";
 
 export default defineEventHandler(async (event) => {
+  const key = getRouterParam(event, "key");
   const dcupl = await useDcuplServerInstance(event);
 
-  return dcupl.query.one({
-    modelKey: "Article",
-    itemKey: getRouterParam(event, "key")!,
-  });
+  const article = key ? dcupl.query.one({ modelKey: "Article", itemKey: key }) : undefined;
+  if (!article) {
+    throw createError({ statusCode: 404, statusMessage: "Article not found" });
+  }
+  return article;
 });
 ```
 
