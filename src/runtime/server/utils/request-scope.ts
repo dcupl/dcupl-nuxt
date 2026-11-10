@@ -9,7 +9,7 @@ export interface DcuplLease {
 
 /** The dcupl instance of one request, see `createRequestScope`. */
 export interface DcuplRequestScope {
-  /** The shared instance, wrapped so that lists created through it belong to this request. */
+  /** The shared instance, wrapped so that lists created through it belong to this request; rejects after `dispose()`. */
   get: () => Promise<Dcupl>;
   /** Destroys the lists this request created, and only those. */
   destroyLists: () => void;
@@ -82,6 +82,12 @@ export function createRequestScope(
   let disposed = false;
   return {
     get() {
+      if (disposed) {
+        // a lease taken now would never be released
+        return Promise.reject(
+          new Error("[dcupl] this request has finished, its dcupl instance is released"),
+        );
+      }
       if (!scoped) {
         lease = acquire();
         scoped = lease.then(({ dcupl }) => scopeDcupl(dcupl, lists));

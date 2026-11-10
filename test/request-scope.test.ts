@@ -84,6 +84,16 @@ describe("request scope (bug 1: app:rendered destroyed every list on the shared 
     expect(release).toHaveBeenCalledTimes(1);
   });
 
+  it("get() after dispose rejects and leases nothing", async () => {
+    const shared = await articles();
+    const acquire = vi.fn(async () => ({ dcupl: shared, release: vi.fn() }));
+    const scope = createRequestScope(acquire);
+    scope.dispose();
+
+    await expect(scope.get()).rejects.toThrow("request has finished");
+    expect(acquire).not.toHaveBeenCalled();
+  });
+
   it("does not lease an instance when the request never asked for one", () => {
     const acquire = vi.fn();
     createRequestScope(acquire).dispose();
