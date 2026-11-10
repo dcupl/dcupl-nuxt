@@ -135,6 +135,27 @@ describe("swapping instances (bug 3: init() not awaited, old instance destroyed 
     expect(builds[0]!.destroy).not.toHaveBeenCalled();
   });
 
+  it("retries a failed rebuild at the next check, though the data did not change again", async () => {
+    const { store, create, shouldUpdate, builds, tick } = setup();
+    await store.acquire();
+    shouldUpdate.mockResolvedValueOnce(true);
+    create.mockRejectedValueOnce(new Error("CDN down"));
+    tick(60_001);
+    await store.checkForUpdate();
+    expect(create).toHaveBeenCalledTimes(2);
+
+    // the status check has recorded the change already and answers false now
+    tick(60_001);
+    await store.checkForUpdate();
+    expect(create).toHaveBeenCalledTimes(3);
+    expect((await store.acquire()).dcupl).toBe(builds[1]);
+
+    // built: no more rebuilds until the next change
+    tick(60_001);
+    await store.checkForUpdate();
+    expect(create).toHaveBeenCalledTimes(3);
+  });
+
   it("builds once when concurrent reloads come in", async () => {
     const { store, create } = setup();
     await store.acquire();

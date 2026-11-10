@@ -25,6 +25,7 @@ interface Generation {
  *
  * - Requests lease the current instance and release it when they finish.
  * - At most one update check runs per `interval`; concurrent callers share it.
+ *   A failed rebuild is retried at the next check.
  * - An update builds the new instance completely before it is swapped in, and
  *   the old instance is destroyed only after its last lease was released.
  */
@@ -35,6 +36,8 @@ export class DcuplServerStore {
   private checking: Promise<void> | undefined;
   private lastCheck = 0;
   private leases = 0;
+  /** A rebuild failed; the next check rebuilds even if nothing changed since. */
+  private stale = false;
   private readonly now: () => number;
   private readonly onError: (error: unknown) => void;
 
@@ -85,7 +88,7 @@ export class DcuplServerStore {
     this.checking = this.options
       .shouldUpdate()
       .then(async (changed) => {
-        if (changed) await this.swap(false);
+        if (changed || this.stale) await this.swap(false);
       })
       .catch(this.onError)
       .finally(() => {
@@ -120,7 +123,16 @@ export class DcuplServerStore {
     if (!this.reloading) {
       this.reloading = (async () => {
         if (!this.active) await this.ensureInitial();
-        const dcupl = await this.build(recordBaseline);
+        let dcupl: Dcupl;
+        try {
+          dcupl = await this.build(recordBaseline);
+        }
+        catch (error) {
+          // the update check has already recorded the change: retry next time
+          this.stale = true;
+          throw error;
+        }
+        this.stale = false;
         const previous = this.active;
         this.active = this.generation(dcupl);
         if (previous) {
