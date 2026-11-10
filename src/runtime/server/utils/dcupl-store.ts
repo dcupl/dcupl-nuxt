@@ -22,15 +22,20 @@ interface Generation {
  * Holds the one dcupl instance of a server process, shared by SSR rendering
  * and Nitro API routes.
  *
+ * - At most one update check runs per `interval`; concurrent callers share it.
  * - An update builds the new instance completely before it is swapped in.
  */
 export class DcuplServerStore {
   private active: Generation | undefined;
   private initial: Promise<void> | undefined;
   private reloading: Promise<Dcupl> | undefined;
+  private checking: Promise<void> | undefined;
+  private lastCheck = 0;
+  private readonly now: () => number;
   private readonly onError: (error: unknown) => void;
 
   constructor(private readonly options: DcuplServerStoreOptions) {
+    this.now = options.now ?? Date.now;
     this.onError
       = options.onError ?? (error => console.error("[dcupl]", error));
   }
@@ -48,15 +53,24 @@ export class DcuplServerStore {
     return { dcupl: generation.dcupl, release: () => undefined };
   }
 
-  /** Runs an update check (on every request unless `interval` is false). */
+  /** Runs an update check unless one ran within `interval` or one is running. */
   checkForUpdate(): Promise<void> {
+    if (this.checking) return this.checking;
     if (this.options.interval === false) return Promise.resolve();
-    return this.options
+    if (this.now() - this.lastCheck < this.options.interval) {
+      return Promise.resolve();
+    }
+    this.lastCheck = this.now();
+    this.checking = this.options
       .shouldUpdate()
       .then(async (changed) => {
         if (changed) await this.swap(false);
       })
-      .catch(this.onError);
+      .catch(this.onError)
+      .finally(() => {
+        this.checking = undefined;
+      });
+    return this.checking;
   }
 
   /** Builds a new instance and swaps it in (used by the reload hook). */
@@ -66,6 +80,7 @@ export class DcuplServerStore {
 
   private ensureInitial(): Promise<void> {
     if (!this.initial) {
+      this.lastCheck = this.now();
       this.initial = this.build(true).then(
         (dcupl) => {
           this.active ??= this.generation(dcupl);
