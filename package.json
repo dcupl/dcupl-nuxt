@@ -1,6 +1,6 @@
 {
   "name": "@dcupl/nuxt",
-  "version": "0.1.0-trial.2",
+  "version": "0.1.0",
   "description": "dcupl Nuxt Module",
   "repository": {
     "type": "git",
@@ -30,9 +30,9 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@dcupl/common": "2.1.0",
-    "@dcupl/core": "2.1.0",
-    "@dcupl/loader": "2.1.0",
+    "@dcupl/common": "^2.1.0",
+    "@dcupl/core": "^2.1.0",
+    "@dcupl/loader": "^2.1.0",
     "@nuxt/kit": "^4.6.4",
     "defu": "^6.1.4"
   },

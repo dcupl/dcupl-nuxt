@@ -14,42 +14,34 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-dcupl - Nuxt is a powerful and easy-to-use Nuxt module that semlessly integrates [dcupl](https://dcupl.com) into your Nuxt application.
+`@dcupl/nuxt` integrates [dcupl](https://dcupl.com) into a Nuxt application: it loads your dcupl Console project once per server process for SSR and Nitro API routes, and once in the browser after hydration.
 
 ## Features
 
-- ⛰ Fully Server Side Compatible (including Nitro API Routes)
-- 🚠 Reload API Hook
+- ⛰ Server-side rendering and Nitro API routes share one dcupl instance per server process
+- 🔁 Background update checks (at most once a minute by default) and a reload API hook
+- 🧹 Lists created during a server request are cleaned up after that request, never those of other requests
 - 🌲 Customizable update validation
+
+## Requirements
+
+- Nuxt 4 (`nuxt` ^4.0), Node.js 20 or later
+- dcupl SDK 2.1 (`@dcupl/core`, `@dcupl/common`, `@dcupl/loader` ^2.1.0, installed with the module)
+- TypeScript 5.4 or later if you type-check (the SDK types use `NoInfer`)
+
+Coming from SDK 1.x? See the [SDK migration guide](https://docs.dcupl.com/sdk/guides/migration). Coming from `@dcupl/nuxt` 0.0.x? See the [CHANGELOG](./CHANGELOG.md#v010).
 
 ## Quick Setup
 
-Install the module to your Nuxt application with one command:
-
 ```bash
 npx nuxi module add @dcupl/nuxt
-```
-
-or using any package manager:
-
-```bash
-# Using pnpm
-pnpm add @dcupl/nuxt
-
-# Using yarn
-yarn add @dcupl/nuxt
-
-# Using npm
+# or
 npm install @dcupl/nuxt
 ```
 
-Add the module to your `nuxt.config.js`:
+Add the module to your `nuxt.config.ts`. This example uses the public `Product Catalog Starter` project of the [dcupl Console](https://console.dcupl.com):
 
-### Simple Setup
-Uses a the public `Product Catalog Starter` - [dcupl Console](https://console.dcupl.com)
-
-```js
-// https://nuxt.com/docs/api/configuration/nuxt-config
+```ts
 export default defineNuxtConfig({
   modules: ["@dcupl/nuxt"],
   dcupl: {
@@ -61,84 +53,82 @@ export default defineNuxtConfig({
 });
 ```
 
-### Advanced Setup
-```js
-export default {
+## Options
+
+```ts
+export default defineNuxtConfig({
   modules: ["@dcupl/nuxt"],
   dcupl: {
-    //Options
+    // any dcupl init option (https://docs.dcupl.com/sdk/api/dcupl#dcuplinitoptions)
     config: {
       projectId: "<YOUR_PROJECT_ID>",
       apiKey: "<YOUR_API_KEY>",
     },
+    // passed to DcuplAppLoader.process()
     loader: {
-      applicationKey: "default", //default value
-      //... loader options
+      applicationKey: "default", // default
     },
+    // enables GET /api/reload-dcupl, see below
     reloadHook: {
-      //or false to deactivate the api endpoint
       secret: "<YOUR_SECRET>",
     },
+    // minimum time between two update checks on the server, in ms (default 60000);
+    // false disables them (the reload hook still works)
+    updateCheckInterval: 60_000,
+    // optional: replaces the built-in update check, return true to rebuild
     shouldUpdate: async () => {
-      //optional, default is the dcupl default implementation see: https://github.com/markus-gx/nuxt-dcupl/blob/main/src/dcupl/dcupl.instance.ts#L49
-      //Here you can add custom functionality how to validate if the update should be applied
-      //to the current instance. If you return false the update will be ignored.
-      return true;
+      return false;
     },
-    // and all other init options provided by dcupl (https://docs.dcupl.com/docs/Introduction)
   },
-};
+});
 ```
+
+| Option | Runtime config | Notes |
+| --- | --- | --- |
+| dcupl init options (`config`, …), `loader` | `runtimeConfig.public.dcupl` | Public: the browser builds its own instance with them. |
+| `reloadHook.secret` | `runtimeConfig.dcupl.reloadHook` | Server only; override with `NUXT_DCUPL_RELOAD_HOOK_SECRET`. |
+| `updateCheckInterval` | `runtimeConfig.dcupl.updateCheckInterval` | Server only; override with `NUXT_DCUPL_UPDATE_CHECK_INTERVAL`. |
+| `shouldUpdate` | build time | Serialized with `toString()` into a server template, so it must not use variables from outside the function. |
+
+## How it works
+
+**Server.** The first request that needs dcupl builds the instance (fetches the app loader configuration of your Console project, processes it, runs `dcupl.init()`); concurrent first requests wait for the same build. All later requests, SSR pages and API routes alike, use that instance. `useDcupl()` and `useDcuplServerInstance(event)` return it wrapped for the request: lists you create through it are destroyed after the request (SSR: once the page has rendered), and `lists.destroy()` without options only destroys the lists of this request.
+
+**Update checks.** At most once per `updateCheckInterval`, a request starts a background check without waiting for it. The built-in check asks the dcupl API whether the Console project changed (`changedAt` of the draft version; it covers files served from the dcupl CDN only, and it is skipped without a `projectId`). If it changed, a new instance is built completely and then swapped in; requests keep the previous instance until then, and the previous instance is destroyed once the last request using it has finished. A failed build keeps the current instance.
+
+**Browser.** After hydration the module builds a separate instance in the browser (`useDcupl()` returns it), so filtering and paging run client-side. Destroy lists you create in components when they unmount.
 
 ## Usage
 
-After setting up the module you can use the `dcupl` instance in your Nuxt application:
-
-### Main Catalog Page
+### List page
 
 ```vue
-<template>
-  <div>
-    <pre><code>{{ JSON.stringify(article, null, 2) }}</code></pre>
-  </div>
-</template>
 <script setup lang="ts">
-const articles = ref<any>([]);
-
 const dcupl = useDcupl();
 
-// create a new list. A DcuplList contains all your model data and persists the applied queries.
+// a DcuplList holds your model data and keeps the applied queries
 const articleList = dcupl.lists.create({ modelKey: "Article" });
 articleList.catalog.query.applyOptions({ count: 10 });
 
-// get initial data
-articles.value = articleList.catalog.query.execute();
+const articles = ref(articleList.catalog.query.execute());
 
-// listen for updates to the list and update the articles
+// follow the list when queries change
 articleList.on((msg) => {
   if (msg.action === "update") {
     articles.value = articleList.catalog.query.execute();
   }
 });
 
-onBeforeUnmount(() => {
-  // cleanup on unmount
-  articleList.destroy();
-});
+// in the browser; on the server the module cleans up after the request
+onBeforeUnmount(() => articleList.destroy());
 </script>
 ```
 
-### Detail Page
+### Detail page
 
 ```vue
-<template>
-  <div>
-    <pre><code>{{ JSON.stringify(article, null, 2) }}</code></pre>
-  </div>
-</template>
 <script setup lang="ts">
 const { key } = useRoute().params;
-
 const dcupl = useDcupl();
 
 const article = dcupl.query.one({
@@ -146,15 +136,13 @@ const article = dcupl.query.one({
   itemKey: key as string,
   projection: {
     $: true,
-    vendorId: {
-      $: true, // also returns the details of the referenced vendor model
-    },
+    vendorId: { $: true }, // also returns the referenced vendor
   },
 });
 </script>
 ```
 
-Or in an API Endpoint (`server/api/articles/[key].ts`):
+### API route (`server/api/articles/[key].ts`)
 
 ```ts
 import { useDcuplServerInstance } from "#dcupl/server";
@@ -162,19 +150,20 @@ import { useDcuplServerInstance } from "#dcupl/server";
 export default defineEventHandler(async (event) => {
   const dcupl = await useDcuplServerInstance(event);
 
-  return dcupl.query.execute({
+  return dcupl.query.one({
     modelKey: "Article",
-    count: 10,
-    queries: [],
+    itemKey: getRouterParam(event, "key")!,
   });
 });
 ```
 
-## Reload dcupl Server Instance
+## Reload hook
 
-To reload the dcupl server Instance you can use the reload hook. This will trigger a reload of the dcupl server session and update the data in your application.
-This module exposes and API Endpoint called `/api/reload-dcupl`.
-Pass an `Authorization` header or an token with the secret you defined in the module options.
+With `reloadHook.secret` set, the module adds `GET /api/reload-dcupl`. Call it with the secret as `Authorization` header or `?token=` query parameter, for example from a webhook after you published in the Console. It builds a new instance and swaps it in for SSR and API routes alike; it answers `200` once the new instance is live, `401` for a wrong secret and `500` when the build failed (the current instance stays).
+
+```bash
+curl -H "Authorization: <YOUR_SECRET>" https://your-app.example/api/reload-dcupl
+```
 
 ## Contribution
 
@@ -197,9 +186,12 @@ Pass an `Authorization` header or an token with the secret you defined in the mo
   # Run ESLint
   npm run lint
   
-  # Run Vitest
+  # Run Vitest (unit tests and an e2e fixture that needs no network)
   npm run test
   npm run test:watch
+
+  # Type-check the module and the playground
+  npm run test:types
   
   # Release new version
   npm run release
