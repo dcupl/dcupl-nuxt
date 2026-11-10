@@ -1,11 +1,5 @@
-import {
-  createError,
-  defineEventHandler,
-  getHeader,
-  getQuery,
-  useNitroApp,
-  useRuntimeConfig,
-} from "#imports";
+import { createError, defineEventHandler, getHeader, getQuery } from "h3";
+import { useNitroApp, useRuntimeConfig } from "nitropack/runtime";
 
 export default defineEventHandler(async (event) => {
   const authorizationHeader = getHeader(event, "Authorization");

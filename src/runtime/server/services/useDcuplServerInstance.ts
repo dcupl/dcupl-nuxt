@@ -1,9 +1,9 @@
 import type { H3Event } from "h3";
 import type { Dcupl } from "@dcupl/core";
 import { DcuplInstance } from "../../dcupl/dcupl.instance";
-import { useNitroApp, useRuntimeConfig } from "#imports";
+import { useNitroApp, useRuntimeConfig } from "nitropack/runtime";
 
-declare module "nitropack" {
+declare module "nitropack/types" {
   interface NitroApp {
     _dcuplNitroInstance: DcuplInstance;
   }
