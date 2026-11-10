@@ -196,6 +196,7 @@ curl -H "Authorization: <YOUR_SECRET>" https://your-app.example/api/reload-dcupl
   # Release: set the version in package.json and write the CHANGELOG section
   # by hand first; this lints, tests, builds and publishes that version as is
   npm run release
+  git tag v$(node -p "require('./package.json').version") && git push --tags
   ```
 
 </details>
