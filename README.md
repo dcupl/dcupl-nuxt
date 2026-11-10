@@ -193,7 +193,8 @@ curl -H "Authorization: <YOUR_SECRET>" https://your-app.example/api/reload-dcupl
   # Type-check the module and the playground
   npm run test:types
   
-  # Release new version
+  # Release: set the version in package.json and write the CHANGELOG section
+  # by hand first; this lints, tests, builds and publishes that version as is
   npm run release
   ```
 
