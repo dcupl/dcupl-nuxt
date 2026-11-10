@@ -14,6 +14,7 @@ export interface DcuplServerStoreOptions {
 
 interface Generation {
   dcupl: Dcupl;
+  leases: number;
   retired: boolean;
   destroyed: boolean;
 }
@@ -22,8 +23,10 @@ interface Generation {
  * Holds the one dcupl instance of a server process, shared by SSR rendering
  * and Nitro API routes.
  *
+ * - Requests lease the current instance and release it when they finish.
  * - At most one update check runs per `interval`; concurrent callers share it.
- * - An update builds the new instance completely before it is swapped in.
+ * - An update builds the new instance completely before it is swapped in, and
+ *   the old instance is destroyed only after its last lease was released.
  */
 export class DcuplServerStore {
   private active: Generation | undefined;
@@ -50,7 +53,17 @@ export class DcuplServerStore {
     }
     // read synchronously after the await: always the newest instance
     const generation = this.active!;
-    return { dcupl: generation.dcupl, release: () => undefined };
+    generation.leases++;
+    let released = false;
+    return {
+      dcupl: generation.dcupl,
+      release: () => {
+        if (released) return;
+        released = true;
+        generation.leases--;
+        this.destroyIfUnused(generation);
+      },
+    };
   }
 
   /** Runs an update check unless one ran within `interval` or one is running. */
@@ -126,11 +139,11 @@ export class DcuplServerStore {
   }
 
   private generation(dcupl: Dcupl): Generation {
-    return { dcupl, retired: false, destroyed: false };
+    return { dcupl, leases: 0, retired: false, destroyed: false };
   }
 
   private destroyIfUnused(generation: Generation): void {
-    if (!generation.retired || generation.destroyed) {
+    if (!generation.retired || generation.leases > 0 || generation.destroyed) {
       return;
     }
     generation.destroyed = true;

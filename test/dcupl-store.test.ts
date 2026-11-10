@@ -80,3 +80,73 @@ describe("update checks (bug 2: a status call on every SSR request)", () => {
     expect(shouldUpdate).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("swapping instances (bug 3: init() not awaited, old instance destroyed in use)", () => {
+  it("serves the old instance until the new one is completely built", async () => {
+    const { store, create, shouldUpdate, builds, tick } = setup();
+    const first = await store.acquire();
+
+    const build = deferred<Dcupl>();
+    create.mockImplementationOnce(() => build.promise);
+    shouldUpdate.mockResolvedValueOnce(true);
+    tick(60_000);
+    const check = store.checkForUpdate();
+
+    const during = await store.acquire();
+    expect(during.dcupl).toBe(first.dcupl);
+    expect(builds[0]!.destroy).not.toHaveBeenCalled();
+
+    const next = fakeDcupl("build-2");
+    build.resolve(next);
+    await check;
+    expect((await store.acquire()).dcupl).toBe(next);
+  });
+
+  it("destroys the old instance only after the last request holding it is done", async () => {
+    const { store, builds } = setup();
+    const a = await store.acquire();
+    const b = await store.acquire();
+
+    await store.reload();
+    expect(builds[0]!.destroy).not.toHaveBeenCalled();
+
+    a.release();
+    a.release(); // idempotent
+    expect(builds[0]!.destroy).not.toHaveBeenCalled();
+    b.release();
+    expect(builds[0]!.destroy).toHaveBeenCalledTimes(1);
+    expect(builds[1]!.destroy).not.toHaveBeenCalled();
+  });
+
+  it("destroys an unused old instance right after the swap", async () => {
+    const { store, builds } = setup();
+    (await store.acquire()).release();
+    await store.reload();
+    expect(builds[0]!.destroy).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the current instance when building the new one fails", async () => {
+    const { store, create, builds } = setup();
+    const first = await store.acquire();
+    create.mockRejectedValueOnce(new Error("CDN down"));
+
+    await expect(store.reload()).rejects.toThrow("CDN down");
+    expect((await store.acquire()).dcupl).toBe(first.dcupl);
+    expect(builds[0]!.destroy).not.toHaveBeenCalled();
+  });
+
+  it("builds once when concurrent reloads come in", async () => {
+    const { store, create } = setup();
+    await store.acquire();
+    await Promise.all([store.reload(), store.reload(), store.reload()]);
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries the initial build on the next request after a failure", async () => {
+    const { store, create } = setup();
+    create.mockRejectedValueOnce(new Error("offline"));
+    await expect(store.acquire()).rejects.toThrow("offline");
+    await expect(store.acquire()).resolves.toBeTruthy();
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+});
