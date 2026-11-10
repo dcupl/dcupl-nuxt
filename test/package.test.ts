@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -46,5 +46,19 @@ describe("built package", () => {
     const types = readFileSync(join(out, "dist/runtime/plugin.d.ts"), "utf8");
     expect(types).toMatch(/dcupl: Dcupl\b/);
     expect(types).not.toMatch(/dcupl: any/);
+  });
+
+  it("leaves the server tsconfig.json out of the tarball", () => {
+    copyFileSync(join(root, "package.json"), join(out, "package.json"));
+    const [packed] = JSON.parse(
+      execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+        cwd: out,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }),
+    ) as [{ files: { path: string }[] }];
+    const files = packed.files.map(file => file.path);
+    expect(files).toContain("dist/runtime/plugin.d.ts");
+    expect(files.filter(file => file.endsWith("tsconfig.json"))).toEqual([]);
   });
 });
