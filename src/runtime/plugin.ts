@@ -1,5 +1,6 @@
 import { DcuplInstance } from "./dcupl/dcupl.instance";
 import type { DcuplModuleOptions } from "../module";
+import { createRequestScope } from "./server/utils/request-scope";
 import { customShouldUpdate } from "#build/should-update";
 import { defineNuxtPlugin, useRequestEvent, useRuntimeConfig } from "#app";
 
@@ -27,28 +28,30 @@ const initializeOrUpdateServerClient = async (dcupl: DcuplModuleOptions) => {
 export default defineNuxtPlugin(async (_nuxtApp) => {
   const { dcupl: dcuplConfig } = useRuntimeConfig().public;
   const sessionDcuplInstance = new DcuplInstance("session", dcuplConfig);
+  let requestDcupl = serverDcuplInstance.dcupl;
   if (import.meta.server) {
     await initializeOrUpdateServerClient(dcuplConfig);
+    const dcupl = serverDcuplInstance.dcupl;
     const event = useRequestEvent();
     if (event) {
-      event.context._dcupl = serverDcuplInstance.dcupl;
+      event.context._dcupl = dcupl;
     }
+    // the instance is shared by concurrent requests: track the lists this
+    // request creates and destroy only those once it has rendered
+    const scope = createRequestScope(async () => ({
+      dcupl,
+      release: () => undefined,
+    }));
+    requestDcupl = await scope.get();
+    _nuxtApp.hook("app:rendered", () => scope.destroyLists());
   } else {
     await sessionDcuplInstance.init(dcuplConfig);
   }
 
-  const { hook } = _nuxtApp;
-
-  hook("app:rendered", () => {
-    if (serverDcuplInstance.dcupl) {
-      serverDcuplInstance.dcupl.lists.destroy();
-    }
-  });
-
   return {
     provide: {
       dcupl: import.meta.server
-        ? serverDcuplInstance.dcupl
+        ? requestDcupl
         : sessionDcuplInstance.dcupl,
       dcuplSession: sessionDcuplInstance,
       dcuplServer: serverDcuplInstance,
