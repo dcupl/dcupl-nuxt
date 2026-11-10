@@ -13,7 +13,7 @@ export interface DcuplRequestScope {
   get: () => Promise<Dcupl>;
   /** Destroys the lists this request created, and only those. */
   destroyLists: () => void;
-  /** Destroys this request's lists and releases the instance; idempotent. */
+  /** Destroys this request's lists and releases the instance once; safe to call again. */
   dispose: () => void;
 }
 
@@ -92,9 +92,10 @@ export function createRequestScope(
       destroyAll(lists);
     },
     dispose() {
+      // every call: an aborted request can still create lists after 'close'
+      destroyAll(lists);
       if (disposed) return;
       disposed = true;
-      destroyAll(lists);
       lease?.then(
         ({ release }) => release(),
         () => undefined,

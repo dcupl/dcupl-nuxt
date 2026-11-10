@@ -34,6 +34,7 @@ export class DcuplServerStore {
   private reloading: Promise<Dcupl> | undefined;
   private checking: Promise<void> | undefined;
   private lastCheck = 0;
+  private leases = 0;
   private readonly now: () => number;
   private readonly onError: (error: unknown) => void;
 
@@ -41,6 +42,11 @@ export class DcuplServerStore {
     this.now = options.now ?? Date.now;
     this.onError
       = options.onError ?? (error => console.error("[dcupl]", error));
+  }
+
+  /** Leases held by requests right now, over all instances (diagnostics and tests). */
+  get openLeases(): number {
+    return this.leases;
   }
 
   /** Leases the current instance; the first call waits for the initial build. */
@@ -54,6 +60,7 @@ export class DcuplServerStore {
     // read synchronously after the await: always the newest instance
     const generation = this.active!;
     generation.leases++;
+    this.leases++;
     let released = false;
     return {
       dcupl: generation.dcupl,
@@ -61,6 +68,7 @@ export class DcuplServerStore {
         if (released) return;
         released = true;
         generation.leases--;
+        this.leases--;
         this.destroyIfUnused(generation);
       },
     };

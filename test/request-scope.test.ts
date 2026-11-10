@@ -68,6 +68,22 @@ describe("request scope (bug 1: app:rendered destroyed every list on the shared 
     expect(release).toHaveBeenCalledTimes(1);
   });
 
+  it("a later dispose destroys lists created after the first one, the lease goes back once", async () => {
+    const shared = await articles();
+    const release = vi.fn();
+    const scope = createRequestScope(async () => ({ dcupl: shared, release }));
+    const dcupl = await scope.get();
+
+    // the client went away ('close'), rendering goes on until afterResponse
+    scope.dispose();
+    dcupl.lists.create({ modelKey: "Article" });
+    scope.dispose();
+    await Promise.resolve();
+
+    expect(shared.lists.getAll()).toHaveLength(0);
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
   it("does not lease an instance when the request never asked for one", () => {
     const acquire = vi.fn();
     createRequestScope(acquire).dispose();
