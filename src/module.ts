@@ -72,10 +72,7 @@ export default defineNuxtModule<DcuplModuleOptions>({
 
     _nuxt.hook("nitro:config", (nitroConfig) => {
       nitroConfig.alias = nitroConfig.alias || {};
-      nitroConfig.alias["#dcupl/server"] = resolve(
-        __dirname,
-        "./runtime/server/services"
-      );
+      nitroConfig.alias["#dcupl/server"] = resolve("./runtime/server/services");
     });
 
     addTemplate({
