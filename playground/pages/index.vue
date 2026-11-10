@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { ListItem } from "@dcupl/common";
 import useDcupl from "../../src/runtime/composables/useDcupl";
 
-const articles = useState("articles", () => []);
+const articles = useState<ListItem[]>("articles", () => []);
 
 const dcupl = useDcupl();
 
@@ -66,7 +67,7 @@ onBeforeUnmount(() => {
         </table>
       </div>
     </div>
-    <hr />
+    <hr >
     <h4>API-Request Test</h4>
     <p v-if="status === 'pending'">Lädt...</p>
     <div v-else>

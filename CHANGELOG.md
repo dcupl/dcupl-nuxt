@@ -1,6 +1,42 @@
 # Changelog
 
 
+## v0.1.0
+
+[compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.10...v0.1.0)
+
+### 🚨 Breaking Changes
+
+- Requires Nuxt 4 and the dcupl SDK 2.1 (`@dcupl/core`, `@dcupl/common`, `@dcupl/loader` ^2.1.0, TypeScript 5.4+ for the SDK types). The module is ESM only. See the SDK migration guide for 1.x → 2.x behaviour changes.
+- Requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`, like Nuxt 4.6 (`engines` in package.json); 0.0.x documented Node 20.
+- `useNuxtApp().$dcuplServer` is removed. `$dcuplSession` is the browser instance holder and `undefined` on the server.
+- `$dcuplSession` lost `shouldUpdate()` and `changedAt`, and `init()` takes no second argument (the custom update function) any more; update checks run on the server only.
+- On the server, `useDcupl()` and `useDcuplServerInstance(event)` return a per-request wrapper of the shared instance; `lists.destroy()` without options destroys only the lists of the current request.
+- Lists created through `useDcuplServerInstance(event)` in API routes are destroyed after the response, also when the route throws or the client aborts. Keep nothing from them beyond the request.
+- `useDcuplServerInstance(event)` rejects once the response has finished (for example in `event.waitUntil()` work started by the route); take the instance before the response.
+- A failed first build of the server instance answers 500 to every SSR request (each request tries the build again); 0.0.x rendered the page with `$dcupl` undefined.
+- Update checks no longer block SSR: a request right after a change can still get the previous data until the new instance is built. Without a `projectId` there are no automatic checks (0.0.x rebuilt the instance on every request).
+- Internal state moved: `nitroApp._dcuplNitroInstance`, `event.context._dcupl` and the `#build/should-update` template are gone.
+
+### 🩹 Fixes
+
+- Destroy only the lists a request created after SSR, not the lists of concurrent requests.
+- Check for updates at most once per `updateCheckInterval` (default 60 s) instead of on every SSR request, and share a running check.
+- Build a new instance completely before swapping it in, and destroy the old one only after the last request using it has finished, also after error responses and aborted requests.
+- Retry a failed background rebuild at the next update check instead of serving the old data until the next change.
+- `useNuxtApp().$dcupl` and `useDcupl()` are typed `Dcupl` in the published types.
+- One instance per server process for SSR and Nitro API routes, so the reload hook refreshes both. The hook answers 500 when the build fails.
+- Keep the `shouldUpdate` function out of the public runtime config.
+
+### 🚀 Enhancements
+
+- New option `updateCheckInterval` (ms, `false` disables automatic checks; runtime config `dcupl.updateCheckInterval`).
+
+### 🏡 Chore
+
+- SDK 2.1.0, @nuxt/kit 4, module-builder 1.0, Vitest 4; playground on Tailwind 4; README for Nuxt 4 and SDK 2.x.
+
+
 ## v0.0.10
 
 [compare changes](https://github.com/dcupl/dcupl-nuxt/compare/v0.0.9...v0.0.10)

@@ -1,13 +1,12 @@
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   modules: ['../src/module'],
   devtools: { enabled: true },
   css: ['~/assets/main.css'],
-  compatibilityDate: '2024-10-25',
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
+  compatibilityDate: '2026-11-10',
+  vite: {
+    plugins: [tailwindcss()],
   },
   dcupl: {
     config: {
@@ -17,7 +16,8 @@ export default defineNuxtConfig({
     reloadHook: {
       secret: 'super-secret',
     },
-    // shouldUpdate: () => {
+    // updateCheckInterval: 60_000,
+    // shouldUpdate: async () => {
     //   console.log('called my custom update function')
     //   return true
     // },
