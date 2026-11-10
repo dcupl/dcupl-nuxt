@@ -25,7 +25,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 ## Requirements
 
-- Nuxt 4 (`nuxt` ^4.0), Node.js 20 or later
+- Nuxt 4 (`nuxt` ^4.0), Node.js 22.22.3+, 24.15+ or 26+ (what Nuxt 4.6 requires: `^22.22.3 || ^24.15.0 || >=26.0.0`)
 - dcupl SDK 2.1 (`@dcupl/core`, `@dcupl/common`, `@dcupl/loader` ^2.1.0, installed with the module)
 - TypeScript 5.4 or later if you type-check (the SDK types use `NoInfer`)
 
