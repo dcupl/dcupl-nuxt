@@ -1,3 +1,4 @@
+import type { Dcupl } from "@dcupl/core";
 import { DcuplInstance } from "./dcupl/dcupl.instance";
 import type { DcuplModuleOptions } from "../module";
 import type {} from "./server/utils/request-scope";
@@ -12,7 +13,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     if (!scope) {
       throw new Error("[dcupl] the server instance is not available on this request");
     }
-    const dcupl = await scope.get();
+    // annotated: inferred, the built types gave consumers `any` for $dcupl
+    const dcupl: Dcupl = await scope.get();
     // destroy only the lists this request created
     nuxtApp.hook("app:rendered", () => scope.destroyLists());
     return {
