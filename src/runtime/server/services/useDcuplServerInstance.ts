@@ -1,36 +1,15 @@
 import type { H3Event } from "h3";
 import type { Dcupl } from "@dcupl/core";
-import { DcuplInstance } from "../../dcupl/dcupl.instance";
-import { useNitroApp, useRuntimeConfig } from "nitropack/runtime";
+import { createRequestScope } from "../utils/request-scope";
+import { useDcuplServerStore } from "../utils/store-instance";
 
-declare module "nitropack/types" {
-  interface NitroApp {
-    _dcuplNitroInstance: DcuplInstance;
-  }
-}
-
-export const useDcuplServerInstance: (
-  event: H3Event
-) => Promise<Dcupl> = async (event: H3Event) => {
-  if (!event.context._dcupl) {
-    const nitroApp = useNitroApp();
-
-    if (!nitroApp._dcuplNitroInstance) {
-      const { dcupl: dcuplConfig } = useRuntimeConfig().public;
-      const dcuplNitroInstance = new DcuplInstance(
-        "nitro_instance",
-        dcuplConfig
-      );
-      await dcuplNitroInstance.init();
-      nitroApp._dcuplNitroInstance = dcuplNitroInstance;
-    }
-    // Since this is stored on Server Side, maybe add a request to "update" the context instaed of validating on every request
-    // if (await nitroApp._dcuplNitroInstance.shouldUpdate()) {
-    //   nitroApp._dcuplNitroInstance.init() // update async
-    // }
-    //
-    return nitroApp._dcuplNitroInstance.dcupl;
-  } else {
-    return event.context._dcupl;
-  }
+/**
+ * The dcupl instance of this server process, the same one SSR rendering uses.
+ * Lists created through it are destroyed when the request has finished.
+ */
+export const useDcuplServerInstance = (event: H3Event): Promise<Dcupl> => {
+  event.context._dcuplScope ??= createRequestScope(() =>
+    useDcuplServerStore().acquire(),
+  );
+  return event.context._dcuplScope.get();
 };

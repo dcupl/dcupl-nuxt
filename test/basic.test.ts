@@ -24,4 +24,20 @@ describe("ssr", async () => {
     for (const page of html) expect(page).toContain("count=100");
     for (const body of json) expect(body.count).toBe(100);
   });
+
+  it("bug 4: SSR and API routes share one instance and the reload hook refreshes both", async () => {
+    const idFrom = (html: string) => html.match(/instance=([\w-]+)/)?.[1];
+    const ssrBefore = idFrom(await $fetch<string>("/instance"));
+    const apiBefore = (await $fetch<{ id: string }>("/api/instance")).id;
+    expect(ssrBefore).toBeTruthy();
+    expect(apiBefore).toBe(ssrBefore);
+
+    await expect($fetch("/api/reload-dcupl")).rejects.toThrow();
+    await $fetch("/api/reload-dcupl", { query: { token: "test-secret" } });
+
+    const ssrAfter = idFrom(await $fetch<string>("/instance"));
+    const apiAfter = (await $fetch<{ id: string }>("/api/instance")).id;
+    expect(ssrAfter).not.toBe(ssrBefore);
+    expect(apiAfter).toBe(ssrAfter);
+  });
 });

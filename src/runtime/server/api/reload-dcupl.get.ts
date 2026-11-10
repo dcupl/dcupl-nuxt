@@ -1,5 +1,6 @@
 import { createError, defineEventHandler, getHeader, getQuery } from "h3";
-import { useNitroApp, useRuntimeConfig } from "nitropack/runtime";
+import { useRuntimeConfig } from "nitropack/runtime";
+import { useDcuplServerStore } from "../utils/store-instance";
 
 export default defineEventHandler(async (event) => {
   const authorizationHeader = getHeader(event, "Authorization");
@@ -9,17 +10,21 @@ export default defineEventHandler(async (event) => {
 
   const { dcupl } = useRuntimeConfig();
 
-  if (authorization !== dcupl.reloadHook?.secret) {
+  if (!dcupl.reloadHook?.secret || authorization !== dcupl.reloadHook.secret) {
     throw createError({
       status: 401,
       statusMessage: "Unauthorized",
     });
   }
-  const nitroApp = useNitroApp();
-  if (nitroApp._dcuplNitroInstance) {
-    await nitroApp._dcuplNitroInstance.init();
-    console.info("[DCUPL] Reloaded nitro instance");
+  try {
+    // builds the new instance completely, then SSR and API routes switch to it
+    await useDcuplServerStore().reload();
   }
+  catch (error) {
+    console.error("[dcupl] reload failed", error);
+    throw createError({ status: 500, statusMessage: "dcupl reload failed" });
+  }
+  console.info("[dcupl] reloaded the server instance");
   return {
     status: 200,
     statusMessage: "OK",

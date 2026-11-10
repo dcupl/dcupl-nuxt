@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   },
   dcupl: {
     reloadHook: { secret: "test-secret" },
+    updateCheckInterval: false,
     // like a real project without changes: only the first check reports one
     shouldUpdate: async () => {
       const state = globalThis as { __dcuplChecks?: number };
