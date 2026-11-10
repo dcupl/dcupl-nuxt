@@ -23,8 +23,8 @@ const init = () => {
   });
 };
 
-const updateFilter = (event: { target: { value: string } }) => {
-  const filterValue = event.target.value;
+const updateFilter = (event: Event) => {
+  const filterValue = (event.target as HTMLSelectElement).value;
 
   if (!filterValue) {
     props.list.catalog.query.remove({ groupKey: props.attribute });
@@ -33,7 +33,7 @@ const updateFilter = (event: { target: { value: string } }) => {
       {
         attribute: props.attribute,
         operator: "eq",
-        value: `${event.target.value}`,
+        value: `${filterValue}`,
       },
       {
         mode: "set",

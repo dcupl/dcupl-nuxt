@@ -15,6 +15,8 @@ export default createConfigForNuxt({
     ],
   },
 })
-  .append(
-    // your custom flat config here...
-  )
+  .append({
+    // Nuxt page files in the test fixtures are named by their route
+    files: ['test/fixtures/**/pages/**/*.vue'],
+    rules: { 'vue/multi-word-component-names': 'off' },
+  })
